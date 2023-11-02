@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Simple Form</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1>Subscribe</h1>
+  <div class="container">
+    <form action="mailto:challenge@dn-uk.com" id="myform" action="" method="post">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input class="name" placeholder="Enter Your Name" type="text" id="name" name="firstname-surname"
+          pattern="^[A-Za-z]{2,}(?: [A-Za-z]{2,})+$" required>
+      </div>
+      <span id="nameError" class="error"></span>
+      <div id="errorName" class="nameError"></div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input placeholder="Enter Your Email Address" type="email" id="email" name="email" required>
+      </div>
+      <span id="emailError" class="error"></span>
+      <div id="errorEmail" class="emailError"></div>
+
+      <div class="form-group">
+        <label for="credit_card">Card:</label>
+        <input placeholder="Enter a Proxy Credit Card Number" type="int" pattern="[0-9]{16,16}" id="credit_card"
+          name="credit_card" required>
+      </div>
+      <span id="errorCard"></span>
+      <input type="submit" value="Submit">
+
+
+      <div id="errorCard" class="error"></div>
+    </form>
+  </div>
+  <script>
+    const name = document.getElementById('name');
+    const card = document.getElementById('credit_card');
+    const email = document.getElementById('email');
+    const errorName = document.getElementById('errorName');
+    const errorCard = document.getElementById('errorCard');
+    const errorEmail = document.getElementById('errorEmail');
+
+    // Event onblur for name input field.
+    name.addEventListener("blur", function (event) {
+      errorName.textContent = "";
+      name.classList.remove("error");
+
+      if (!name.checkValidity()) {
+        name.classList.add("nameError");
+        name.style.border = '3px solid';
+        name.style.borderColor = 'rgba(231, 0, 100)';
+        errorName.textContent = "Please enter a valid name!";
+        event.preventDefault();
+      }
+    })
+
+    // Event onblur for email input field.
+    email.addEventListener("blur", function (event) {
+      errorEmail.textContent = '';
+      email.classList.remove("error");
+
+      if (!email.checkValidity()) {
+        email.classList.add("emailError");
+        email.style.border = '3px solid';
+        email.style.borderColor = 'rgba(231, 0, 100)';
+        errorEmail.textContent = "Please enter a valid email address!";
+        event.preventDefault();
+      }
+    })
+
+    // Event onblur for card input field.
+    card.addEventListener("blur", function (event) {
+      errorCard.textContent = "";
+      card.classList.remove("error");
+
+      const cardValidationMessages = validate_card(card.value);
+      if (cardValidationMessages.length > 0) {
+        card.classList.add("error");
+        card.style.border = '3px solid';
+        card.style.borderColor = 'rgba(231, 0, 100)';
+        errorCard.textContent = 'You have entered an invalid card number.';
+        event.preventDefault();
+      }
+    })
+
+    function validate_card(card) {
+      let error_messages = [];
+      // Validate card number length.
+      if (card.toString().length !== 16) {
+        error_messages.push('Your card number must be 16 digits in length.');
+      }
+      // Validate card number for numeric characters.
+      else if (!card.toString().match(/^[0-9]+$/)) {
+        error_messages.push('Your card number must contain only numeric characters.');
+      }
+
+      // Check that the sum of the card number is not equal to zero.
+      else if (card.toString().split('').map(Number).reduce((a, b) => a + b) == 0) {
+        error_messages.push('Please enter a valid card number');
+      }
+
+      // Create an array from card number digits.
+      let int = card.toString().split('').map(Number);
+
+      for (let i = int.length - 2; i >= 0; i = i - 2) {
+        // double every second digit from the right.
+        let val = int[i] * 2;
+
+        // Sum digits of numbers greater than nine.
+        if (val > 9) {
+          val = val % 10 + 1;
+        }
+        console.log(val);
+        // store digit back into int array at ith position.
+        int[i] = val;
+      }
+
+      // Sum all digits in the modified int array.
+      let total = 0;
+
+      for (let i = 0; i < int.length; i++) {
+        total += int[i];
+      }
+      // Check digit total is a multiple of 10.
+      if (total % 10 == 0) {
+        return null;
+      } else {
+        error_messages.push('Your card has been rejected.');
+      }
+      return error_messages.join(' ');
+    }
+  </script>
+</body>
+
+</html>
